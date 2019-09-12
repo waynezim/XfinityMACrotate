@@ -1,4 +1,4 @@
-$NetworkAdapterName = 'Wi-Fi 2'
+. .\Config.ps1
 
 [string] $MACAddress = '02' + [BitConverter]::ToString([BitConverter]::GetBytes((Get-Random -Maximum 0xFFFFFFFFFFFF)), 0, 5).Replace('-', '')
 
