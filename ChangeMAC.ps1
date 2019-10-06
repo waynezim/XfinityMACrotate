@@ -2,11 +2,7 @@
 
 [string] $MACAddress = '02' + [BitConverter]::ToString([BitConverter]::GetBytes((Get-Random -Maximum 0xFFFFFFFFFFFF)), 0, 5).Replace('-', '')
 
-[int]$InterfaceIndex = (Get-NetAdapter | Where-Object Name -eq $NetworkAdapterName).InterfaceIndex
-
 $InterfaceName = (Get-NetAdapter | Where-Object Name -eq $NetworkAdapterName).InterfaceDescription
-
-[string]$InterfaceIndexReg = "{0:d4}" -f ($InterfaceIndex-1)
 
 $List = Get-ChildItem "HKLM:\SYSTEM\CurrentControlSet\Control\Class\{4d36e972-e325-11ce-bfc1-08002be10318}" -ErrorAction SilentlyContinue | Select-Object pspath
 
