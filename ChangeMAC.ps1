@@ -1,4 +1,4 @@
-. .\Config.ps1
+$NetworkAdapterName = Get-NetAdapter | Where-Object Name -like '*Wi-Fi*' | Select-Object -expand Name
 
 [string] $MACAddress = '02' + [BitConverter]::ToString([BitConverter]::GetBytes((Get-Random -Maximum 0xFFFFFFFFFFFF)), 0, 5).Replace('-', '')
 
@@ -22,7 +22,7 @@ Get-ItemPropertyValue -Path $AdapterRegPath -Name 'NetworkAddress'
 
 netsh wlan connect name='xfinitywifi'
 
-while ((Get-NetIPAddress -InterfaceIndex $InterfaceIndex -AddressFamily IPv4 -ErrorAction SilentlyContinue | Where-Object IPAddress -ne 127.0.0.1).SuffixOrigin -ne 'Dhcp') {sleep -Milliseconds 100}
+while ((Get-NetIPAddress -InterfaceAlias $NetworkAdapterName -AddressFamily IPv4 -ErrorAction SilentlyContinue | Where-Object IPAddress -ne 127.0.0.1).SuffixOrigin -ne 'Dhcp') {sleep -Milliseconds 100}
 
 $test = 0
 do {

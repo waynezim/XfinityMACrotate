@@ -1,1 +1,0 @@
-$NetworkAdapterName = 'Wi-Fi 2'
