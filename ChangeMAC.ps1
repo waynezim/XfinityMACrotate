@@ -4,15 +4,25 @@
 
 [int]$InterfaceIndex = (Get-NetAdapter | Where-Object Name -eq $NetworkAdapterName).InterfaceIndex
 
+$InterfaceName = (Get-NetAdapter | Where-Object Name -eq $NetworkAdapterName).InterfaceDescription
+
 [string]$InterfaceIndexReg = "{0:d4}" -f ($InterfaceIndex-1)
 
-Get-ItemPropertyValue -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Class\{4d36e972-e325-11ce-bfc1-08002be10318}\$InterfaceIndexReg" -Name 'NetworkAddress'
+$List = Get-ChildItem "HKLM:\SYSTEM\CurrentControlSet\Control\Class\{4d36e972-e325-11ce-bfc1-08002be10318}" -ErrorAction SilentlyContinue | Select-Object pspath
 
-Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Class\{4d36e972-e325-11ce-bfc1-08002be10318}\$InterfaceIndexReg" -Name 'NetworkAddress' -Value $MACAddress -Force
+$AdapterRegPath = $List | Get-ItemProperty -Name DriverDesc -ErrorAction SilentlyContinue | Where-Object DriverDesc -eq $InterfaceName | Select-Object -expand pspath
+
+if ($null -eq $AdapterRegPath){
+    Throw "Failed to translate $NetworkAdapterName to DriverDesc in registry"
+}
+
+Get-ItemPropertyValue -Path $AdapterRegPath -Name 'NetworkAddress'
+
+Set-ItemProperty -Path $AdapterRegPath -Name 'NetworkAddress' -Value $MACAddress -Force
 
 Get-NetAdapter -Name $NetworkAdapterName | Restart-NetAdapter
 
-Get-ItemPropertyValue -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Class\{4d36e972-e325-11ce-bfc1-08002be10318}\$InterfaceIndexReg" -Name 'NetworkAddress'
+Get-ItemPropertyValue -Path $AdapterRegPath -Name 'NetworkAddress'
 
 netsh wlan connect name='xfinitywifi'
 
